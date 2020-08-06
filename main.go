@@ -19,9 +19,8 @@ type GithubResponse struct {
 }
 
 type SlackPayload struct {
-	Channel  string `json:"channel"`
-	UserName string `json:"username"`
-	Text     string `json:"text"`
+	Channel string `json:"channel"`
+	Text    string `json:"text"`
 }
 
 func main() {
@@ -29,7 +28,6 @@ func main() {
 	token := os.Getenv("GIT_PR_RELEASE_TOKEN")
 	webhookURL := os.Getenv("SLACK_WEBHOOK_URL")
 	sChannel := os.Getenv("SLACK_CHANNEL")
-	userName := os.Getenv("SLACK_USER_NAME")
 
 	prNumber, err := strconv.Atoi(os.Getenv("PR_NUMBER"))
 	if err != nil {
@@ -43,9 +41,8 @@ func main() {
 	}
 
 	p := SlackPayload{
-		Channel:  sChannel,
-		UserName: userName,
-		Text:     message,
+		Channel: sChannel,
+		Text:    message,
 	}
 
 	b, err := json.Marshal(p)

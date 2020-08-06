@@ -1,7 +1,7 @@
 # pr-slack-notificator
 
 PRのdescription中の最初に見つかった引用
-```aaa```
+\`\`\`で囲まれたもの
 をslackに通知する君
 
 必要な環境変数

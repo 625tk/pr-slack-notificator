@@ -100,5 +100,7 @@ func getPRBody(ctx context.Context, repository, token string, prNumber int) (str
 	if len(sp) < 2 {
 		return "", errors.New("failed to split quotes")
 	}
-	return "```" + sp[1] + "```", nil
+
+	prURL := fmt.Sprintf("\n ref: https://github.com/%s/pull/%d \n", repository, prNumber)
+	return "```" + sp[1] + prURL + "```", nil
 }

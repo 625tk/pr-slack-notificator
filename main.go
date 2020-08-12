@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type GithubResponse struct {
@@ -100,7 +101,12 @@ func getPRBody(ctx context.Context, repository, token string, prNumber int) (str
 	if len(sp) < 2 {
 		return "", errors.New("failed to split quotes")
 	}
+	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
+	f := time.Now().In(jst).Format("2006-01-02 15:04")
+
+	replaced := strings.Replace(sp[1], "[TIME]", f, -1)
 
 	prURL := fmt.Sprintf("\n ref: https://github.com/%s/pull/%d \n", repository, prNumber)
-	return "```" + sp[1] + prURL + "```", nil
+
+	return "```" + replaced + prURL + "```", nil
 }

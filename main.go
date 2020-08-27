@@ -26,9 +26,10 @@ type SlackPayload struct {
 
 func main() {
 	repo := os.Getenv("REPOSITORY")
-	token := os.Getenv("GIT_PR_RELEASE_TOKEN")
+	githubToken := os.Getenv("GIT_PR_RELEASE_TOKEN")
 	webhookURL := os.Getenv("SLACK_WEBHOOK_URL")
 	sChannel := os.Getenv("SLACK_CHANNEL")
+	slackToken := os.Getenv("SLACK_API_TOKEN")
 
 	prNumber, err := strconv.Atoi(os.Getenv("PR_NUMBER"))
 	if err != nil {
@@ -36,7 +37,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	message, err := getPRBody(ctx, repo, token, prNumber)
+	message, err := getPRBody(ctx, repo, githubToken, prNumber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,8 +51,40 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if webhookURL != "" {
+		postViaWebhook(bytes.NewReader(b), webhookURL)
+	} else if slackToken != "" {
+		postViaAPI(bytes.NewReader(b), slackToken)
+	}
 
-	_, err = http.Post(webhookURL, "application/json", bytes.NewReader(b))
+}
+
+func postViaWebhook(reader *bytes.Reader, url string) {
+	res, err := http.Post(url, "application/json", reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	a, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(a)
+}
+
+func postViaAPI(reader *bytes.Reader, token string) {
+	url := "https://slack.com/api/chat.postMessage"
+
+	r, err := http.NewRequest("POST", url, reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r.Header.Set("Content-Type", "application/json")
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	_, err = http.DefaultClient.Do(r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,4 +142,5 @@ func getPRBody(ctx context.Context, repository, token string, prNumber int) (str
 	prURL := fmt.Sprintf("\n ref: https://github.com/%s/pull/%d \n", repository, prNumber)
 
 	return "```" + replaced + prURL + "```", nil
+
 }

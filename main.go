@@ -66,11 +66,11 @@ func postViaWebhook(reader *bytes.Reader, url string) {
 	}
 	defer res.Body.Close()
 
-	a, err := ioutil.ReadAll(res.Body)
+	m, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(a)
+	log.Println(m)
 }
 
 func postViaAPI(reader *bytes.Reader, token string) {
@@ -84,10 +84,17 @@ func postViaAPI(reader *bytes.Reader, token string) {
 	r.Header.Set("Content-Type", "application/json")
 	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	_, err = http.DefaultClient.Do(r)
+	b, err := http.DefaultClient.Do(r)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer b.Body.Close()
+
+	m, err := ioutil.ReadAll(b.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(m)
 }
 
 func getPRBody(ctx context.Context, repository, token string, prNumber int) (string, error) {
@@ -129,7 +136,6 @@ func getPRBody(ctx context.Context, repository, token string, prNumber int) (str
 		return "", err
 	}
 
-	fmt.Println(r)
 	sp := strings.Split(r.Body, "```")
 	if len(sp) < 2 {
 		return "", errors.New("failed to split quotes")

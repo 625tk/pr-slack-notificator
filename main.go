@@ -31,6 +31,14 @@ func main() {
 	sChannel := os.Getenv("SLACK_CHANNEL")
 	slackToken := os.Getenv("SLACK_API_TOKEN")
 
+	if repo == "" {
+		log.Fatal("repository not set")
+	}
+
+	if githubToken == "" {
+		log.Fatal("git pr release token not set")
+	}
+
 	prNumber, err := strconv.Atoi(os.Getenv("PR_NUMBER"))
 	if err != nil {
 		log.Fatal("failed to parse env PR_NUMBER, ", err)

@@ -99,6 +99,7 @@ func postViaAPI(reader *bytes.Reader, token string) {
 
 func getPRBody(ctx context.Context, repository, token string, prNumber int) (string, error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/pulls/%d", repository, prNumber)
+	log.Println("url: ", url)
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",

@@ -78,7 +78,7 @@ func postViaWebhook(reader *bytes.Reader, url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(m)
+	log.Println(string(m))
 }
 
 func postViaAPI(reader *bytes.Reader, token string) {
@@ -102,7 +102,7 @@ func postViaAPI(reader *bytes.Reader, token string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(m)
+	log.Println(string(m))
 }
 
 func getPRBody(ctx context.Context, repository, token string, prNumber int) (string, error) {

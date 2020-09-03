@@ -1,0 +1,45 @@
+version: 2.1
+description: this orb posts first code-block in pull request description to slack.
+
+executors:
+  default:
+    description: >
+      Any available tag from this list can be used:
+      https://github.com/users/625tk/packages/container/pr-slack-notificator/29188
+    docker:
+      - image:  'ghcr.io/625tk/pr-slack-notificator:<<parameters.tag>>'
+    parameters:
+      tag:
+        default: 1.0.6
+        type: string
+        description: image version tag
+
+commands:
+  post_to_slack:
+    description: this orb posts first code-block in pull request description to slack.
+    parameters:
+      repository:
+        type: string
+        description: repository e.g.) 625tk/pr-slack-notificatior
+      pr_number:
+        type: string
+        description: number of pull request
+      slack_channel:
+        type: string
+        description: channel name(or id) e.g.) times_625
+      git_pr_release_token:
+        type: env_var_name
+        default: GIT_PR_RELEASE_TOKEN
+        description: access token to read github repository
+      slack_webhook_url:
+        type: env_var_name
+        default: SLACK_WEBHOOK_URL
+        description: slack webhook url (SLACK_WEBHOOK_URL or SLACK_API_TOKEN is required)
+      slack_api_token:
+        type: env_var_name
+        default: SLACK_API_TOKEN
+        description: slack api token (SLACK_WEBHOOK_URL or SLACK_API_TOKEN is required)
+    steps:
+      - run:
+          name: pr-slack-notificator
+          command: PR_NUMBER=<<parameters.pr_number>> REPOSITORY=<<parameters.repository>> SLACK_CHANNEL=<<parameters.slack_channel>> /pr-slack-notificator
